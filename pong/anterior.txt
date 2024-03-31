@@ -1,0 +1,35 @@
+def update():
+    global player_left_score, player_right_score
+
+    # Move the ball
+    ball.x += ball.dx
+    ball.y += ball.dy
+    hit=ball.intersects()
+    if hit.hit:
+        ball.x=-ball.dx
+
+    # Bounce the ball off the paddles
+    if ball.x < -6 and ball.y < paddle_left.y - 3.5 and ball.y > paddle_left.y + 3.5:
+        ball.dx *= -1
+    if ball.x > 6 and ball.y < paddle_right.y - 3.5 and ball.y > paddle_right.y - 3.5:
+        ball.dx *= -1
+
+
+    # Bounce the ball off the top and bottom
+    if ball.y > 4.55:
+        ball.dy *= -1
+    if ball.y < -4.55:
+        ball.dy *= -1
+
+    # Reset the ball and update scores
+    if ball.x < -10:
+        player_right_score += 1
+        ball.position = (0, 0)
+        ball.dx += random.random()
+    if ball.x > 10:
+        player_left_score += 1
+        ball.position = (0, 0)
+        ball.dx += -random.random()
+
+    # Update the score display  
+    score.text = f'{player_left_score} - {player_right_score}'
