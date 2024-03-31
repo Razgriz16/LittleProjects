@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import * as sphere from '/Users/pdavi/Desktop/Op Zvezda/9s minigame/enemyCore.js'
-import * as cone from '/Users/pdavi/Desktop/Op Zvezda/9s minigame/cone.js'
-import * as plane from '/Users/pdavi/Desktop/Op Zvezda/9s minigame/plane.js'
+import * as sphere from '9s Minigame/enemyCore.js'
+import * as cone from '9s minigame/cone.js'
+import * as plane from '9s minigame/plane.js'
 
 
 // Scene
