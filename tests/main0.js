@@ -1,0 +1,227 @@
+import * as THREE from 'three';
+import * as enemy from '/Users/pdavi/Desktop/Op Zvezda/9s minigame/enemyCircle.js'
+
+/////////////////////PARTE 1 COMPLETADA (mov, disparar [space], rotacion) ////////////
+class Cone {
+    constructor(scene) {
+        this.geometry = new THREE.ConeGeometry(1, 3, 32);
+        this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.mesh.rotation.x = Math.PI / -2;
+        this.mesh.position.y = -0.50;
+        scene.add(this.mesh);
+    }
+    move(direction) {
+        switch (direction) {
+            case 'left':
+                this.mesh.position.x -= 0.1;
+                break;
+            case 'right':
+                this.mesh.position.x += 0.1;
+                break;
+            case 'up':
+                this.mesh.position.z -= 0.1;
+                break;
+            case 'down':
+                this.mesh.position.z += 0.1;
+                break;
+        }
+    }
+    rotate(direction) {
+        switch (direction) {
+            case 'left':
+                this.mesh.rotation.z += 0.06;
+                break;
+            case 'right':
+                this.mesh.rotation.z -= 0.06;
+                break;
+        }
+    }
+}
+class Bullet {
+    constructor(scene, position, rotation) {
+        this.geometry = new THREE.BoxGeometry(0.2, 0.2, 0.5);
+        this.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.mesh.position.copy(position);
+        this.mesh.position.y += 0.5;
+        this.mesh.rotation.copy(rotation);
+        this.mesh.rotateX(Math.PI / -2);
+        scene.add(this.mesh);
+        // Store the initial rotation of the bullet
+       this.initialRotation = this.mesh.rotation.clone();
+    }
+    move() {
+        const direction = new THREE.Vector3(0, 0, -1); // Initial direction
+        // Apply the bullet's rotation to the direction vector
+        direction.applyQuaternion(this.mesh.quaternion);
+        // Move the bullet in the direction it's facing
+        this.mesh.position.add(direction.multiplyScalar(-0.3)); // Adjust the speed as needed
+    }
+}
+class Controls {
+    constructor() {
+        this.keyControls = {
+            left: false,
+            right: false,
+            up: false,
+            down: false
+        };
+        this.keyControlsArrow = {
+            left: false,
+            right: false,
+            up: false,
+            down: false
+        };
+        document.addEventListener('keydown', (event) => {
+            this.onKeyDown(event);
+        });
+        document.addEventListener('keyup', (event) => {
+            this.onKeyUp(event);
+        });
+    }
+    onKeyDown(event) {
+        switch (event.key) {
+            case 'a':
+                this.keyControls.left = true;
+                break;
+            case 'd':
+                this.keyControls.right = true;
+                break;
+            case 'w':
+                this.keyControls.up = true;
+                break;
+            case 's':
+                this.keyControls.down = true;
+                break;
+            case 'ArrowLeft':
+                this.keyControlsArrow.left = true;
+                break;
+            case 'ArrowRight':
+                this.keyControlsArrow.right = true;
+                break;
+            case 'ArrowUp':
+                this.keyControlsArrow.up = true;
+                break;
+            case 'ArrowDown':
+                this.keyControlsArrow.down = true;
+                break;
+        }
+    }
+    onKeyUp(event) {
+        switch (event.key) {
+            case 'a':
+                this.keyControls.left = false;
+                break;
+            case 'd':
+                this.keyControls.right = false;
+                break;
+            case 'w':
+                this.keyControls.up = false;
+                break;
+            case 's':
+                this.keyControls.down = false;
+                break;
+            case 'ArrowLeft':
+                this.keyControlsArrow.left = false;
+                break;
+            case 'ArrowRight':
+                this.keyControlsArrow.right = false;
+                break;
+            case 'ArrowUp':
+                this.keyControlsArrow.up = false;
+                break;
+            case 'ArrowDown':
+                this.keyControlsArrow.down = false;
+                break;
+        }
+    }
+}
+// Scene
+const scene = new THREE.Scene();
+// Camera
+const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.z = 10;
+camera.position.y = 15;
+camera.rotation.x = (299 * Math.PI) / 180;
+// Renderer
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+// Create Cone
+const cone = new Cone(scene);
+
+// Create a moving sphere
+const sphere = new enemy.MovingSphere(scene, 25);
+
+// Plane Geometry
+const planeGeometry = new THREE.BoxGeometry(25, 0.1, 25);
+// Plane Material
+const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xcccccc });
+// Plane Mesh
+const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+plane.position.y = -1.55;
+plane.rotation.x = 0;
+plane.rotation.y = 0;
+scene.add(plane);
+
+
+
+// Bullets
+const bullets = [];
+const controls = new Controls();
+let shootBullet = false;
+let lastBulletTime = Date.now();
+document.addEventListener('keydown', (event) => {
+    switch (event.key) {
+        case ' ':
+            shootBullet = true;
+            break;
+    }
+});
+document.addEventListener('keyup', (event) => {
+    switch (event.key) {
+        case ' ':
+            shootBullet = false;
+            break;
+    }
+});
+
+
+
+
+// Render
+function render() {
+    requestAnimationFrame(render);
+    // Move the cone based on keyboard input
+    if (controls.keyControls.left) cone.move('left');
+    if (controls.keyControls.right) cone.move('right');
+    if (controls.keyControls.up) cone.move('up');
+    if (controls.keyControls.down) cone.move('down');
+    // Rotate the cone based on keyboard input
+    if (controls.keyControlsArrow.left) cone.rotate('left');
+    if (controls.keyControlsArrow.right) cone.rotate('right');
+    //sphere
+    sphere.moveRandomly();
+    // Shoot bullets
+    if (shootBullet) {
+        const currentTime = Date.now();
+        if (currentTime - lastBulletTime > 90) { // Shoot a bullet every 200ms
+            const bullet = new Bullet(scene, cone.mesh.position, cone.mesh.rotation);
+            bullets.push(bullet);
+            lastBulletTime = currentTime;
+        }
+    }
+    // Move bullets
+    for (let i = 0; i < bullets.length; i++) {
+        const bullet = bullets[i];
+        bullet.move();
+        if (bullet.mesh.position.z < -15) { // Remove bullets that are off-screen
+            scene.remove(bullet.mesh);
+            bullets.splice(i, 1);
+            i--;
+        }
+    }
+    renderer.render(scene, camera);
+}
+render();
