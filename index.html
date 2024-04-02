@@ -11,9 +11,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
 
+
+
 //0x00ff00
 
-class MovingSphere {
+ class MovingSphere {
     constructor(scene, planeSize) {
         this.geometry = new THREE.SphereGeometry(1, 32, 32);
         this.material = new THREE.MeshBasicMaterial({ color: 0x808080 });
@@ -37,6 +39,7 @@ class MovingSphere {
         }
     }
 }
+
 
 //scene
 const scene = new THREE.Scene();
